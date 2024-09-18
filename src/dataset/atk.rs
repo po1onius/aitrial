@@ -31,11 +31,11 @@ impl Atkgen {
             }
             None => {
                 let fp = self.path.join(task_id.to_string().as_str());
-                let mut f = OpenOptions::new().read(true).write(true).create(true).truncate(true).open(&fp).await?;
-                for _ in 0..30 {
-                    let _ = f.write("abc\n".as_bytes()).await?;
+                if fp.exists() {
+                    return Err(Error::msg("task finish yet?"));
                 }
-                f.seek(std::io::SeekFrom::Start(0)).await?;
+                Self::generate(&fp).await?;
+                let f = OpenOptions::new().read(true).open(&fp).await?;
                 let br = BufReader::new(f);
                 let mut lines = br.lines();
                 let re = lines.next_line().await?;
@@ -45,10 +45,18 @@ impl Atkgen {
                         Ok(l)
                     }
                     None => {
-                        Err(Error::msg("lines error"))
+                        Ok(String::default())
                     }
                 }
             }
         }
+    }
+
+    async fn generate(p: &Path) -> Result<()> {
+        let mut f = OpenOptions::new().read(true).write(true).create(true).truncate(true).open(p).await?;
+        for _ in 0..100 {
+            let _ = f.write("abc\n".as_bytes()).await?;
+        }
+        Ok(())
     }
 }

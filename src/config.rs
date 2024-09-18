@@ -8,7 +8,8 @@ use serde::Deserialize;
 pub struct Config {
     pub dataset_path: String,
     pub judge_url: String,
-    pub target_url: String
+    pub target_url: String,
+    pub fy_port: u32
 }
 
 

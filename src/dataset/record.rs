@@ -15,7 +15,7 @@ impl Record {
     }
 
     pub async fn store(&mut self, content: (u32, &str)) -> Result<()> {
-        
+        panic!("");        
     }
 }
 
