@@ -4,10 +4,15 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use axum::{
     extract::Json,
-    response::IntoResponse,
+    response::{IntoResponse, Response},
     routing::{get, post},
     Router,
+    body::{Body, BodyDataStream},
+    http::StatusCode
 };
+use tokio::fs::File;
+use tokio_util::io::ReaderStream;
+
 
 use crate::{config::get_config, utils::get_id};
 
@@ -32,6 +37,8 @@ pub struct Task {
     pub target_url: String,
     pub reqfmt: String
 }
+
+
 
 #[derive(Serialize)]
 struct Output {
@@ -59,7 +66,8 @@ impl Fy {
                 let s = Arc::clone(&self.fy_s);
                 move |body| handle_post(body, s)
             }))
-            .route("/option", get(handle_option));
+            .route("/option", get(handle_option))
+            .route("/result", get(handle_file));
 
         let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}",self.port)).await?;
         axum::serve(listener, app).await?;
@@ -102,4 +110,23 @@ async fn handle_option() -> impl IntoResponse {
     };
 
     Json(r)
+}
+
+async fn handle_file() -> impl IntoResponse {
+
+    
+    let file_path = "";
+
+    match File::open(file_path).await {
+        Ok(file) => {
+            let stream = ReaderStream::new(file);
+
+            let body = Body::from_stream(stream);
+            (StatusCode::OK, body)
+        }
+        Err(_) => (
+            StatusCode::NOT_FOUND,
+            "File not found".into_response().into_body(),
+        ),
+    }
 }
