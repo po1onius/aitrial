@@ -25,7 +25,7 @@ impl Atkgen {
                         Ok(l)
                     }
                     None => {
-                        Ok("fallback".to_string())
+                        Ok(String::default())
                     }
                 }
             }
@@ -53,8 +53,8 @@ impl Atkgen {
     }
 
     async fn generate(p: &Path) -> Result<()> {
-        let mut f = OpenOptions::new().read(true).write(true).create(true).truncate(true).open(p).await?;
-        for _ in 0..100 {
+        let mut f = OpenOptions::new().write(true).create(true).open(p).await?;
+        for _ in 0..10 {
             let _ = f.write("abc\n".as_bytes()).await?;
         }
         Ok(())

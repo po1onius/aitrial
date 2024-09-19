@@ -11,6 +11,6 @@ use config::get_config;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut srv = service::AtSrv::new(&get_config().judge_url, &get_config().target_url, &get_config().dataset_path, get_config().fy_port);
+    let mut srv = service::AtSrv::new(&get_config().judge_url, &get_config().dataset_path, get_config().fy_port);
     srv.run().await
 }

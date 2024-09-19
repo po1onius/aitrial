@@ -8,12 +8,6 @@ pub struct Model {
     req: Client,
 }
 
-#[derive(Deserialize)]
-struct Resp {
-    response: String
-}
-
-
 impl Model {
     pub fn new(url: &str) -> Self {
         Self {
@@ -24,10 +18,9 @@ impl Model {
 
     pub async fn generate(&self, prompt: &str) -> Result<String> {
         let mut arg = std::collections::HashMap::new();
-        arg.insert("message", prompt);
+        arg.insert("prompt", prompt);
         let response = self.req.post(&self.url).json(&arg).send().await?.json::<Value>().await?;
 
-        //let rm: Resp = serde_json::from_str(&response)?;
         let response = response.get("response");
         match response {
             Some(r) => {

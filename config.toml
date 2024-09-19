@@ -1,4 +1,5 @@
 dataset_path = "assets"
-judge_url = "http://127.0.0.1:8011/judge"
-target_url = "http://127.0.0.1:8011/target"
-fy_port = 8012
+judge_url = "http://127.0.0.1:8012/judge"
+fy_port = 8011
+atk_type = ["政治", "版权"]
+atk_mode = ["模拟", "肯定"]
