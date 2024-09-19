@@ -1,17 +1,18 @@
 use tokio::sync::mpsc::Sender;
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use axum::{
-    extract::Json,
+    extract::{Json, Path},
     response::{IntoResponse, Response},
     routing::{get, post},
     Router,
     body::{Body, BodyDataStream},
-    http::StatusCode
+    http::{StatusCode, Uri}
 };
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
+use std::path::PathBuf;
 
 
 use crate::{config::get_config, utils::get_id};
@@ -67,7 +68,7 @@ impl Fy {
                 move |body| handle_post(body, s)
             }))
             .route("/option", get(handle_option))
-            .route("/result", get(handle_file));
+            .route("/result/:param", get(handle_file));
 
         let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}",self.port)).await?;
         axum::serve(listener, app).await?;
@@ -112,10 +113,11 @@ async fn handle_option() -> impl IntoResponse {
     Json(r)
 }
 
-async fn handle_file() -> impl IntoResponse {
+async fn handle_file(uri: Uri, Path(param): Path<String>) -> impl IntoResponse {
 
-    
-    let file_path = "";
+    println!("{}, {}", uri.to_string(), param);
+        
+    let file_path = PathBuf::from_str(&get_config().dataset_path).unwrap().join(format!("result-{}",param));
 
     match File::open(file_path).await {
         Ok(file) => {
